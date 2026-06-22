@@ -30,24 +30,30 @@ def list_products():
 
     products = cursor.fetchall()
 
-    for product in products:
-        print(product)
+    if len(products) == 0:
+        print("No products found.")
+    else:
+        for product in products:
+            print(product)
 
     conn.close()
 
 
-def test_product():
-    add_product(
-        "ICE001",
-        "Vanilla Ice Cream",
-        None,
-        4.50,
-        2.00,
-        100,
-        10
-    )
+def add_test_product():
+    try:
+        add_product(
+            "ICE001",
+            "Vanilla Ice Cream",
+            None,
+            4.50,
+            2.00,
+            100,
+            10
+        )
+    except sqlite3.IntegrityError:
+        print("Product already exists.")
 
 
 if __name__ == "__main__":
-    test_product()
+    add_test_product()
     list_products()
