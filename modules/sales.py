@@ -25,8 +25,9 @@ def create_invoice(customer_id, items, payment_method):
         subtotal += price * quantity
 
 
-    tax = subtotal * TAX_RATE
-    total = subtotal + tax
+    tax = round(subtotal * TAX_RATE, 2)
+    total = round(subtotal + tax, 2)
+    subtotal = round(subtotal, 2)
 
 
     # Create invoice
@@ -95,9 +96,10 @@ def create_invoice(customer_id, items, payment_method):
 
 
     print("Invoice created successfully.")
-    print("Subtotal:", subtotal)
-    print("Tax:", tax)
-    print("Total:", total)
+    print("-----------------------------")
+    print(f"Subtotal: ${subtotal:.2f}")
+    print(f"Tax: ${tax:.2f}")
+    print(f"Total: ${total:.2f}")
 
 
 
