@@ -1,108 +1,102 @@
 import sqlite3
 
-conn = sqlite3.connect("database/heladeria.db")
+DB = "database/northpos.db"
+
+conn = sqlite3.connect(DB)
 cursor = conn.cursor()
 
-# Categorías
 cursor.execute("""
-CREATE TABLE IF NOT EXISTS categorias (
+CREATE TABLE IF NOT EXISTS categories (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    nombre TEXT NOT NULL UNIQUE
+    name TEXT NOT NULL UNIQUE
 )
 """)
 
-# Productos
 cursor.execute("""
-CREATE TABLE IF NOT EXISTS productos (
+CREATE TABLE IF NOT EXISTS products (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    codigo TEXT UNIQUE,
-    nombre TEXT NOT NULL,
-    categoria_id INTEGER,
-    precio_venta REAL NOT NULL,
-    costo REAL NOT NULL,
+    code TEXT UNIQUE,
+    name TEXT NOT NULL,
+    category_id INTEGER,
+    sale_price REAL NOT NULL,
+    cost REAL NOT NULL,
     stock REAL DEFAULT 0,
-    stock_minimo REAL DEFAULT 5,
-    activo INTEGER DEFAULT 1,
-    FOREIGN KEY (categoria_id) REFERENCES categorias(id)
+    minimum_stock REAL DEFAULT 5,
+    active INTEGER DEFAULT 1,
+    FOREIGN KEY (category_id) REFERENCES categories(id)
 )
 """)
 
-# Clientes
 cursor.execute("""
-CREATE TABLE IF NOT EXISTS clientes (
+CREATE TABLE IF NOT EXISTS customers (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    nombre TEXT NOT NULL,
-    telefono TEXT,
+    name TEXT NOT NULL,
+    phone TEXT,
     email TEXT,
-    direccion TEXT,
-    credito_disponible REAL DEFAULT 0
+    address TEXT,
+    available_credit REAL DEFAULT 0
 )
 """)
 
-# Proveedores
 cursor.execute("""
-CREATE TABLE IF NOT EXISTS proveedores (
+CREATE TABLE IF NOT EXISTS suppliers (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    nombre TEXT NOT NULL,
-    telefono TEXT,
+    name TEXT NOT NULL,
+    phone TEXT,
     email TEXT
 )
 """)
 
-# Usuarios
 cursor.execute("""
-CREATE TABLE IF NOT EXISTS usuarios (
+CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    usuario TEXT UNIQUE,
+    username TEXT UNIQUE,
     password TEXT,
-    rol TEXT
+    role TEXT
 )
 """)
 
-# Facturas
 cursor.execute("""
-CREATE TABLE IF NOT EXISTS facturas (
+CREATE TABLE IF NOT EXISTS invoices (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    numero TEXT UNIQUE,
-    fecha DATETIME DEFAULT CURRENT_TIMESTAMP,
-    cliente_id INTEGER,
+    invoice_number TEXT UNIQUE,
+    date DATETIME DEFAULT CURRENT_TIMESTAMP,
+    customer_id INTEGER,
     subtotal REAL,
-    impuestos REAL,
+    tax REAL,
     total REAL,
-    metodo_pago TEXT,
-    FOREIGN KEY(cliente_id) REFERENCES clientes(id)
+    payment_method TEXT,
+    FOREIGN KEY(customer_id) REFERENCES customers(id)
 )
 """)
 
-# Detalle Factura
 cursor.execute("""
-CREATE TABLE IF NOT EXISTS detalle_factura (
+CREATE TABLE IF NOT EXISTS invoice_details (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    factura_id INTEGER,
-    producto_id INTEGER,
-    cantidad REAL,
-    precio REAL,
+    invoice_id INTEGER,
+    product_id INTEGER,
+    quantity REAL,
+    price REAL,
     subtotal REAL,
-    FOREIGN KEY(factura_id) REFERENCES facturas(id),
-    FOREIGN KEY(producto_id) REFERENCES productos(id)
+    FOREIGN KEY(invoice_id) REFERENCES invoices(id),
+    FOREIGN KEY(product_id) REFERENCES products(id)
 )
 """)
 
-# Kardex
 cursor.execute("""
-CREATE TABLE IF NOT EXISTS kardex (
+CREATE TABLE IF NOT EXISTS inventory_movements (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    producto_id INTEGER,
-    fecha DATETIME DEFAULT CURRENT_TIMESTAMP,
-    movimiento TEXT,
-    cantidad REAL,
-    saldo REAL,
-    observacion TEXT,
-    FOREIGN KEY(producto_id) REFERENCES productos(id)
+    product_id INTEGER,
+    date DATETIME DEFAULT CURRENT_TIMESTAMP,
+    movement_type TEXT,
+    quantity REAL,
+    balance REAL,
+    note TEXT,
+    FOREIGN KEY(product_id) REFERENCES products(id)
 )
 """)
 
 conn.commit()
 conn.close()
 
-print("Base de datos creada correctamente.")
+print("NorthPOS database created successfully.")
