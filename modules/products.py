@@ -7,16 +7,21 @@ def add_product(code, name, category_id, sale_price, cost, stock, minimum_stock)
     conn = sqlite3.connect(DB)
     cursor = conn.cursor()
 
-    cursor.execute("""
-    INSERT INTO products
-    (code, name, category_id, sale_price, cost, stock, minimum_stock)
-    VALUES (?, ?, ?, ?, ?, ?, ?)
-    """, (code, name, category_id, sale_price, cost, stock, minimum_stock))
+    try:
+        cursor.execute("""
+        INSERT INTO products
+        (code, name, category_id, sale_price, cost, stock, minimum_stock)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+        """, (code, name, category_id, sale_price, cost, stock, minimum_stock))
 
-    conn.commit()
-    conn.close()
+        conn.commit()
+        print("Product added successfully.")
 
-    print("Product added successfully.")
+    except sqlite3.IntegrityError:
+        print("Error: Product code already exists.")
+
+    finally:
+        conn.close()
 
 
 def list_products():
@@ -24,13 +29,14 @@ def list_products():
     cursor = conn.cursor()
 
     cursor.execute("""
-    SELECT id, code, name, sale_price, stock
+    SELECT id, code, name, sale_price, cost, stock, minimum_stock, active
     FROM products
+    ORDER BY name
     """)
 
     products = cursor.fetchall()
 
-    if len(products) == 0:
+    if not products:
         print("No products found.")
     else:
         for product in products:
@@ -39,21 +45,61 @@ def list_products():
     conn.close()
 
 
-def add_test_product():
-    try:
-        add_product(
-            "ICE001",
-            "Vanilla Ice Cream",
-            None,
-            4.50,
-            2.00,
-            100,
-            10
-        )
-    except sqlite3.IntegrityError:
-        print("Product already exists.")
+def search_product(keyword):
+    conn = sqlite3.connect(DB)
+    cursor = conn.cursor()
+
+    cursor.execute("""
+    SELECT id, code, name, sale_price, stock
+    FROM products
+    WHERE code LIKE ? OR name LIKE ?
+    """, (f"%{keyword}%", f"%{keyword}%"))
+
+    products = cursor.fetchall()
+
+    if not products:
+        print("No matching products found.")
+    else:
+        for product in products:
+            print(product)
+
+    conn.close()
+
+
+def update_product(product_id, name, sale_price, cost, stock, minimum_stock):
+    conn = sqlite3.connect(DB)
+    cursor = conn.cursor()
+
+    cursor.execute("""
+    UPDATE products
+    SET name = ?, sale_price = ?, cost = ?, stock = ?, minimum_stock = ?
+    WHERE id = ?
+    """, (name, sale_price, cost, stock, minimum_stock, product_id))
+
+    conn.commit()
+    conn.close()
+
+    print("Product updated successfully.")
+
+
+def delete_product(product_id):
+    conn = sqlite3.connect(DB)
+    cursor = conn.cursor()
+
+    cursor.execute("""
+    UPDATE products
+    SET active = 0
+    WHERE id = ?
+    """, (product_id,))
+
+    conn.commit()
+    conn.close()
+
+    print("Product disabled successfully.")
 
 
 if __name__ == "__main__":
-    add_test_product()
+    print("NORTHPOS - PRODUCTS MODULE")
+    print("--------------------------")
+
     list_products()
