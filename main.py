@@ -21,46 +21,74 @@ def show_menu():
 
 
 def main():
+
     while True:
+
         show_menu()
+
         option = input("Select option: ")
 
         if option == "1":
+
             list_products()
 
+
         elif option == "2":
+
             list_customers()
 
+
         elif option == "3":
+
+            customer_id = int(input("Customer ID: "))
+            product_id = int(input("Product ID: "))
+            quantity = float(input("Quantity: "))
+            payment_method = input("Payment Method: ")
+
             create_invoice(
-                1,
+                customer_id,
                 [
-                    (1, 1),
-                    (2, 1)
+                    (product_id, quantity)
                 ],
-                "Cash"
+                payment_method
             )
 
+
         elif option == "4":
+
             list_inventory_movements()
 
+
         elif option == "5":
+
             sales_summary()
+
             print()
+
             top_products()
 
+
         elif option == "6":
+
             username = input("Username: ")
+
             password = input("Password: ")
+
             login(username, password)
 
+
         elif option == "7":
+
             print("Exiting NorthPOS...")
+
             break
 
+
         else:
+
             print("Invalid option. Please try again.")
 
 
 if __name__ == "__main__":
+
     main()
